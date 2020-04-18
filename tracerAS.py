@@ -41,7 +41,6 @@ def get_asn(ip):
 def get_country_provider(ip, is_grey):
     country_provider_query = "https://stat.ripe.net/data/address-space-hierarchy/data.json?resource="
     country_provider_resp = requests.get(country_provider_query + ip)
-    #print(country_provider_resp.text)
     json_dict = json.loads(country_provider_resp.text)
     cp_arr = json_dict["data"]["exact"]
     country = cp_arr[0]["country"]

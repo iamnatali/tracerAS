@@ -25,7 +25,6 @@ def filter_list(out):
 def get_ip_list(user_input):
     res = subprocess.run(["tracert", "-d", "-h", "10", user_input], capture_output=True)
     out = str(res.stdout, encoding="cp866").split("\r\n")
-    print(out)
     return filter_list(out)
 
 
@@ -34,7 +33,7 @@ def get_asn(ip):
     asn_resp = requests.get(asn_query + ip)
     json_dict = json.loads(asn_resp.text)
     asn_arr = json_dict["data"]
-    if len(asn_arr) != 0:
+    if len(asn_arr) != 0 and len(asn_arr["asns"]):
         asn = asn_arr["asns"][0]
         return asn
 
@@ -42,13 +41,16 @@ def get_asn(ip):
 def get_country_provider(ip, is_grey):
     country_provider_query = "https://stat.ripe.net/data/address-space-hierarchy/data.json?resource="
     country_provider_resp = requests.get(country_provider_query + ip)
+    #print(country_provider_resp.text)
     json_dict = json.loads(country_provider_resp.text)
     cp_arr = json_dict["data"]["exact"]
     country = cp_arr[0]["country"]
     if is_grey:
         provider = "grey address is not managed by the RIPE NCC"
-    else:
+    elif len(cp_arr) != 0 and  "descr" in cp_arr[0]:
         provider = cp_arr[0]["descr"]
+    else:
+        provider = "no provider info"
     return country, provider
 
 
